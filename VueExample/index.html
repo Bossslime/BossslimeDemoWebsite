@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Vue Example</title>
+
+    <script src="../lib/Vue2/vue.min.js"></script>
+
+    <style>
+      /* CSS Variables */
+      :root {
+        --background-sidebar: #121212;
+
+        --background-main: #212121;
+
+        --background-button: #2296f3;
+        --background-button-hover: #1c7ed6;
+        --background-button-danger: #e53935;
+        --background-button-danger-hover: #c62828;
+
+        --text-main: rgba(255, 255, 255, 1);
+      }
+
+      /* Default Styling */
+      html, body                               { width: 100%; height: 100%; margin: 0; padding: 0; font-family: 'Saira', sans-serif; }
+
+      /* VueApp Mount */
+      #vueApp                                  { width: 100%; height: 100%; display: flex; flex-direction: row; }
+
+      /* Sidebar Stuff */
+      .sidebar                                 { width: 15%; min-width: 300px; height: 100%; display: flex; flex-direction: column; align-items: center; background-color: var(--background-sidebar); color: var(--text-main); }
+      .sidebar-header                          { height: 50px; width: 90%; border-bottom: 1px solid var(--background-main); display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bolder; }
+      .sidebar-body                            { position: relative; width: 100%; height: calc(100% - 50px); display: flex; flex-direction: row; overflow-y: auto; }
+      .sidebar-body-item                       { width: 50%; height: auto; padding: 15px; gap: 10px; display: flex; flex-direction: column; align-items: center; }
+      /* position: sticky; means the object will stick when it reaches top: 0; */
+      .sidebar-body-item-header                { position: sticky; top: 0; z-index: 1; padding: 0 15px 1px 15px; margin: 0; font-size: 24px; font-weight: bolder; border-bottom: 2px solid var(--background-main); background-color: var(--background-sidebar); }
+      .sidebar-body-item-text                  { font-size: 20px; font-weight: bolder; margin: 0; }
+
+      /* Body Stuff */
+      .body-container                          { width: 85%; min-width: calc(100% - 300px); height: 100%; display: flex; flex-direction: column; gap: 10px; justify-content: center; align-items: center; overflow-y: auto; background-color: var(--background-main); color: var(--text-main); }
+
+      .button-container                        { display: flex; flex-direction: row; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px;}
+      .button                                  { padding: 10px 10px; font-size: 24px; font-weight: bolder; user-select: none; border-radius: 5px; background-color: var(--background-button); color: var(--text-main); }
+      .button:hover                            { cursor: pointer; background-color: var(--background-button-hover); }
+      .button:active                           { background-color: var(--background-button); }
+      .button-danger                           { padding: 10px 10px; font-size: 24px; font-weight: bolder; user-select: none; border-radius: 5px; background-color: var(--background-button-danger); color: var(--text-main); }
+      .button-danger:hover                     { cursor: pointer; background-color: var(--background-button-danger-hover); }
+      .button-danger:active                    { background-color: var(--background-button-danger); }
+    </style>
+  </head>
+  <body>
+    <div id="vueApp">
+      <div class="sidebar">
+        <div class="sidebar-header">
+          Sidebar Object
+        </div>
+
+        <div class="sidebar-body">
+          <div class="sidebar-body-item">
+            <h2 class="sidebar-body-item-header">Odds</h2>
+            <!-- For every number in the number array -->
+            <template v-for="number of numbers">
+              <!-- Only display odds in this object -->
+              <p class="sidebar-body-item-text" v-if="!isEven(number)">
+                {{ number }}
+              </p>
+            </template>
+          </div>
+
+          <div class="sidebar-body-item">
+            <h2 class="sidebar-body-item-header">Evens</h2>
+            <!-- For every number in the number array -->
+            <template v-for="number of numbers">
+              <!-- Only display evens in this object -->
+              <p class="sidebar-body-item-text" v-if="isEven(number)">
+                {{ number }}
+              </p>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <body-container></body-container>
+    </div>
+  </body>
+
+  <script>
+    Vue.component('body-container', {
+      template: `
+          <div class="body-container">
+            <div class="button-container">
+              <!-- @click is another way to access a method. Its the vue version of onclick along with :click="???" -->
+              <div class="button" @click="addOne()">
+                {{ addOneButtonText }}
+              </div>
+
+              <div class="button" @click="addFive()">
+                {{ addFiveButtonText }}
+              </div>
+
+              <div class="button" @click="addTen()">
+                {{ addTenButtonText }}
+              </div>
+            </div>
+
+            <div class="button-container">
+              <div class="button-danger" @click="removeOne()">
+                {{ removeOneButtonText }}
+              </div>
+
+              <div class="button-danger" @click="removeFive()">
+                {{ removeFiveButtonText }}
+              </div>
+
+              <div class="button-danger" @click="removeTen()">
+                {{ removeTenButtonText }}
+              </div>
+            </div>
+            <div class="button-danger" @click="clearNumbers()">
+              {{ clearNumbersButtonText }}
+            </div>
+
+            <p>&copy; Bossslime.com 2020-{{ $root.currentYear }}</p>
+          </div>
+        `,
+      data() {
+        return {
+          addOneButtonText: 'Add One', //This is a data property
+          addFiveButtonText: 'Add Five',
+          addTenButtonText: 'Add Ten',
+
+          removeOneButtonText: 'Remove One',
+          removeFiveButtonText: 'Remove Five',
+          removeTenButtonText: 'Remove Ten',
+
+          clearNumbersButtonText: 'Clear Numbers'
+        }
+      },
+      methods: {
+        addOne() {
+          //$root goes to the app object and can call a method or access data from there.
+          this.$root.addOne();
+        },
+
+        addFive() {
+          //$root goes to the app object and can call a method or access data from there.
+          this.$root.addNumber(5);
+        },
+
+        addTen() {
+          //$root goes to the app object and can call a method or access data from there.
+          this.$root.addNumber(10);
+        },
+
+        removeOne() {
+          //$root goes to the app object and can call a method or access data from there.
+          this.$root.removeOne();
+        },
+
+        removeFive() {
+          //$root goes to the app object and can call a method or access data from there.
+          this.$root.removeNumber(5);
+        },
+
+        removeTen() {
+          //$root goes to the app object and can call a method or access data from there.
+          this.$root.removeNumber(10);
+        },
+
+        clearNumbers() {
+          this.$root.clearNumbers();
+        }
+      }
+    });
+
+    const app = new Vue({
+      el: '#vueApp',
+      data() {
+        return {
+          currentYear: new Date().getFullYear(), //Used for copyright
+
+          numbers: [] //This is a data property
+        }
+      },
+
+      methods: {
+        addOne() {
+          //This accesses this objects instance and can access data and methods.
+          //In this case we access the numbers array and push a new number to it.
+          this.numbers.push(this.numbers.length + 1);
+        },
+
+        addNumber(num) {
+          //This accesses this objects instance and can access data and methods.
+          //In this case we access the numbers array and push a new number to it.
+          for (let i = 0; i < num; i++) {
+            this.numbers.push(this.numbers.length + 1);
+          }
+        },
+
+        removeOne() {
+          //Don't remove too many numbers
+          if (this.numbers.length === 0) {
+            return;
+          }
+          //This accesses this objects instance and can access data and methods.
+          //In this case we access the numbers array and push a new number to it.
+          this.numbers.pop();
+        },
+
+        removeNumber(num) {
+          //Don't remove too many numbers
+          if (num > this.numbers.length) {
+            num = this.numbers.length;
+          }
+          //This accesses this objects instance and can access data and methods.
+          //In this case we access the numbers array and push a new number to it.
+          for (let i = 0; i < num; i++) {
+            this.numbers.pop();
+          }
+        },
+
+        clearNumbers() {
+          //Can't do anything if there are no numbers
+          if (this.numbers.length === 0) {
+            return;
+          }
+
+          this.numbers = [];
+        },
+
+        isEven(num) {
+          //Modulus 2 of any whole number will always equal 0 or 1. 0 is even and 1 is odd.
+          return num % 2 === 0;
+        }
+      },
+
+      //These are computed properties. They are like data properties, but they are computed instead of stored.
+      //They are also cached, so they only run when the data they are watching changes.
+      computed: {
+        //These methods aren't used in this project because I wanted to show how a v-if works. But these can be accessed
+        //just like any other data property.
+        evenNumbers() {
+          return this.numbers.filter(num => this.isEven(num));
+        },
+        oddNumbers() {
+          return this.numbers.filter(num => !this.isEven(num));
+        }
+      },
+      watch: {
+        numbers(newValue, oldValue) {
+          //This is a watcher. It watches for changes in the numbers array and runs this function when it changes.
+          console.log('Numbers changed from ' + oldValue + ' to ' + newValue);
+        }
+      },
+      mounted() {} //This is a lifecycle hook. It runs after the component is mounted to the DOM.
+    });
+  </script>
+</html>

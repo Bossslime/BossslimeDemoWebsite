@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+
+        <script src="../lib/Vue3/vue.global.min.js"></script>
+
+        <link rel="stylesheet" href="../lib/Vue3/vuetify/vuetify.min.css" />
+        <script src="../lib/Vue3/vuetify/vuetify.min.js"></script>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+
+        <style>
+            :root {
+                --background-main: #212121;
+                --background-main-faded: rgba(33, 33, 33, 0.85);
+
+                --background-secondary: #121212;
+
+                --background-button: #2296f3;
+                --background-button-hover: #1c7ed6;
+                --background-button-danger: #e53935;
+                --background-button-danger-hover: #c62828;
+
+                --text-main: rgba(255, 255, 255, 1);
+            }
+
+
+            html, body                                      { height: 100%; width: 100%; margin: 0; overflow: hidden; font-family: 'Saira', sans-serif; }
+
+            #vueApp                                         { height: 100%; width: 100%; }
+
+            * p                                             { margin: 0; }
+
+            .background                                     { height: 100%; width: 100%; z-index: 0; color: white; background-color: #212121; transition: 300ms background-color ease; }
+            .background:has(#game-1:hover)                  { background-color: green; }
+            .background:has(#game-2:hover)                  { background-color: yellow; }
+            .background:has(#game-3:hover)                  { background-color: blue; }
+
+            .content-container                              { position: absolute; overflow: auto; z-index: 1; width: 100%; height: 100%; top: 0; left: 0; display: flex; flex-direction: column; align-items: center; gap: 25px; background-color: var(--background-main-faded); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); }
+
+            .content-game-container                         { display: flex; width: 100%; flex-wrap: wrap; gap: 25px; justify-content: center; align-items: center; }
+            .content-game-object                            { position: relative; height: 500px; max-width: 100%; width: 400px; background-color: var(--background-secondary); border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; overflow: hidden; }
+
+            .content-game-object-info-button                { opacity: 0; position: absolute; z-index: 2; top: 15px; right: 15px; transition: 300ms opacity ease; }
+            .content-game-object:hover
+            .content-game-object-info-button                { opacity: 1; }
+
+            @media (max-width: 1200px) {
+                .content-game-object-info-button            { opacity: 1; }
+            }
+
+            .content-game-object-image                      { width: 100%; max-height: 100%; object-fit: cover; }
+            .content-game-object-info                       { position: absolute; z-index: 2; bottom: 0; width: 100%; height: 135px; padding: 5px 15px; display: flex; flex-direction: column; box-shadow: 0 -5px 20px 25px var(--background-secondary); background-color: var(--background-secondary); }
+            .content-game-object-info-title                 { height: 38px; overflow: hidden; }
+            .content-game-object-info-title h4              { margin: 0; line-height: 18px }
+            .content-game-object-info-title p               { margin: 0; font-size: 10px; }
+            .content-game-object-info-genres                { height: 40px; display: flex; flex-wrap: wrap; gap: 5px; overflow: hidden; }
+
+            .content-game-object-info-genre-object          { height: fit-content; padding: 2px 5px; border-radius: 5px; border: 2px solid var(--background-main); }
+            .content-game-object-info-genre-object p        { line-height: 16px; }
+
+            .content-game-object-info-button-container      { height: 57px; width: 100%; overflow: hidden; display: flex; justify-content: end; align-items: center; }
+
+
+            .footer                                         { width: 100%; height: 40px; display: flex; justify-content: center; align-items: center; }
+        </style>
+    </head>
+    <body>
+        <div id="vueApp">
+            <v-app>
+                <v-main>
+                    <div class="background">
+                        <div class="content-container">
+                            <h1>Games</h1>
+                            <div class="content-game-container">
+                                <div class="content-game-object" id="game-1">
+                                    <img src="images/cover-minecraft.png" class="content-game-object-image" alt="Minecraft">
+
+                                    <div class="content-game-object-info">
+                                        <div class="content-game-object-info-title">
+                                            <h4>Minecraft</h4>
+                                            <p>Mojang Studios</p>
+                                        </div>
+
+                                        <div class="content-game-object-info-genres">
+                                            <div class="content-game-object-info-genre-object"><p>Adventure</p></div>
+                                            <div class="content-game-object-info-genre-object"><p>Sandbox</p></div>
+                                            <div class="content-game-object-info-genre-object"><p>Survival</p></div>
+                                        </div>
+
+                                        <div class="content-game-object-info-button-container">
+                                            <v-btn style="height: 65%;" color="info">Buy Game</v-btn>
+                                        </div>
+                                    </div>
+
+                                    <v-btn class="content-game-object-info-button" icon density="comfortable" variant="tonal">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="white" height="24" viewBox="0 -960 960 960" width="24"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+                                    </v-btn>
+                                </div>
+
+                                <div class="content-game-object" id="game-2">
+                                    <img src="images/cover-eldenring.png" class="content-game-object-image" alt="Elden Ring">
+
+
+                                    <div class="content-game-object-info">
+                                        <div class="content-game-object-info-title">
+                                            <h4>Elden Ring</h4>
+                                            <p>FromSoftware</p>
+                                        </div>
+
+                                        <div class="content-game-object-info-genres">
+                                            <div class="content-game-object-info-genre-object"><p>Action</p></div>
+                                            <div class="content-game-object-info-genre-object"><p>Adventure</p></div>
+                                            <div class="content-game-object-info-genre-object"><p>RPG</p></div>
+                                        </div>
+
+                                        <div class="content-game-object-info-button-container">
+                                            <v-btn style="height: 65%;" color="info">Buy Game</v-btn>
+                                        </div>
+                                    </div>
+
+                                    <v-btn class="content-game-object-info-button" icon density="comfortable" variant="tonal">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="white" height="24" viewBox="0 -960 960 960" width="24"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+                                    </v-btn>
+                                </div>
+
+                                <div class="content-game-object" id="game-3">
+                                    <img src="images/cover-subnautica.png" class="content-game-object-image" alt="Subnautica">
+
+
+                                    <div class="content-game-object-info">
+                                        <div class="content-game-object-info-title">
+                                            <h4>Subnautica</h4>
+                                            <p>Unknown Worlds Entertainment</p>
+                                        </div>
+
+                                        <div class="content-game-object-info-genres">
+                                            <div class="content-game-object-info-genre-object"><p>Adventure</p></div>
+                                            <div class="content-game-object-info-genre-object"><p>Indie</p></div>
+                                            <div class="content-game-object-info-genre-object"><p>Survival</p></div>
+                                        </div>
+
+                                        <div class="content-game-object-info-button-container">
+                                            <v-btn style="height: 65%;" color="info">Buy Game</v-btn>
+                                        </div>
+                                    </div>
+
+                                    <v-btn class="content-game-object-info-button" icon density="comfortable" variant="tonal">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="white" height="24" viewBox="0 -960 960 960" width="24"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+                                    </v-btn>
+                                </div>
+                            </div>
+
+                            <div class="footer">
+                                <p>&copy; Bossslime.com 2020-{{ currentYear }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </v-main>
+            </v-app>
+        </div>
+    </body>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    currentYear: new Date().getFullYear(),
+
+                    // Set to true to disable the skeleton loader animation
+                    boilerplate: true
+                }
+            }
+        });
+
+        const vuetify = Vuetify.createVuetify({
+            theme: {
+                defaultTheme: 'light'
+            }
+        });
+
+        app.use(vuetify);
+
+        app.mount('#vueApp');
+    </script>
+</html>

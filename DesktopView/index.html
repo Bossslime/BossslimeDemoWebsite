@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Desktop Demo</title>
+
+    <script src="../lib/Vue3/vue.global.min.js"></script>
+
+    <link rel="stylesheet" href="../lib/Vue3/vuetify/vuetify.min.css" />
+    <script src="../lib/Vue3/vuetify/vuetify.min.js"></script>
+
+    <script src="../lib/sortable.min.js"></script>
+    <script src="../lib/Vue3/vuedraggable.umd.min.js"></script>
+
+    <style>
+      :root {
+        --background-main: #212121;
+        --background-main-faded: rgba(33, 33, 33, 0.7);
+        --background-secondary: #121212;
+        --background-secondary-faded: rgba(18, 18, 18, 0.5);
+
+        --background-taskbar-button: rgba(255, 255, 255, 0.1);
+
+        --background-button: #2296f3;
+        --background-button-hover: #1c7ed6;
+        --background-button-danger: #e53935;
+        --background-button-danger-hover: #c62828;
+
+        --text-main: rgba(255, 255, 255, 1);
+        --text-main-faded: rgba(255, 255, 255, 0.50);
+
+        --text-info: #2296f3;
+        --text-info-faded: rgba(34, 150, 243, 0.25);
+      }
+
+      html, body                    { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; }
+
+      #vueApp                       { height: 100%; width: 100%; display: flex; align-items: center; overflow: hidden; }
+
+      .background-image             { height: 100%; width: 100%; object-fit: cover; }
+
+      .overlay-container            { position: absolute; top: 0; left: 0; height: 100%; width: 100%; display: flex; flex-direction: column; }
+
+      .app-grid-container           { height: calc(100% - 50px); width: 100%; display: flex; flex-direction: row; padding: 2.5px 5px; gap: 5px 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
+      .app-grid-item                { width: 75px; height: 100px; cursor: pointer; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+      .app-grid-item-logo           { width: 100%; height: 70px; display: flex; justify-content: center; align-items: center; }
+      .app-grid-item-label          { max-width: 100%; height: 30px; display: flex; text-align: center; line-height: 16px; color: var(--text-main); }
+      .app-grid-item:focus          { background-color: var(--text-info-faded); border: 1px dashed var(--text-info); }
+
+      .app-grid-item-blank          { width: 75px; height: 100px; }
+
+      .app-taskbar-container        { height: 50px; width: 100%; display: flex; flex-direction: row; gap: 5px; justify-content: center; align-items: center; background-color: var(--background-main-faded); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+      .app-taskbar-button           { height: 35px; width: 35px; border-radius: 5px; display: flex; justify-content: center; align-items: center; background-color: var(--background-taskbar-button); cursor: pointer; user-select: none; }
+      .app-taskbar-button-primary   { height: 40px; width: 40px; margin: 0 10px; border-radius: 5px; display: flex; justify-content: center; align-items: center; background-color: var(--background-taskbar-button); cursor: pointer; user-select: none; }
+
+      .app-menu-container           { position: absolute; bottom: 55px; left: 50%; transform: translateX(-50%); max-height: calc(100% - 55px); height: 500px; max-width: 100%; width: 750px; border-radius: 5px; overflow: hidden; background-color: var(--background-main-faded); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: 250ms height ease-out, 225ms width ease; }
+
+      .app-menu-content-container   { width: 100%; height: 100%; color: white; overflow: hidden; white-space: nowrap; scrollbar-width: none; display: flex; justify-content: center; align-items: center; }
+      .app-menu-content-section     {  }
+
+      .menu-anim-enter-from         { height: 0; width: 0; }
+      .menu-anim-enter-to           { height: 500px; width: 750px; }
+      .menu-anim-leave-before       { height: 500px; width: 750px; }
+      .menu-anim-leave-to           { height: 0; width: 0; }
+    </style>
+  </head>
+
+  <body>
+    <div id="vueApp">
+      <img src="images/wp-1.jpg" class="background-image" alt="It no work :(">
+
+      <div class="overlay-container">
+        <draggable handle=".app-grid-item" id="appsGrid" class="app-grid-container" :list="gridArray" @change="moveApp" @start="dragging = true" @end="dragging = false">
+          <template v-for="index of gridArray">
+            <div v-if="getAppFromIndex(index) != undefined" :style="{'border': dragging ? '1px dashed var(--text-info-faded)' : ''}" tabindex="0" class="app-grid-item">
+              <div class="app-grid-item-logo">
+                <img src="images/icons/github.svg" alt="No Work :(">
+              </div>
+
+              <div class="app-grid-item-label">
+                Test App
+              </div>
+            </div>
+
+            <div v-else class="app-grid-item-blank" :style="{'border': dragging ? '1px dashed var(--text-info-faded)' : ''}"></div>
+          </template>
+        </draggable>
+
+        <div class="app-taskbar-container">
+          <div class="app-taskbar-button" v-ripple>
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
+          </div>
+
+          <div class="app-taskbar-button-primary" @click="menuOpen = !menuOpen" v-ripple>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="var(--text-info)" height="25px" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg>
+          </div>
+
+          <div class="app-taskbar-button" v-ripple>
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <Transition name="menu-anim">
+        <div class="app-menu-container" v-if="menuOpen" v-click-outside="clickOutsideMenu">
+          <div class="app-menu-content-container">
+            <h1>Content Goes Here</h1>
+          </div>
+        </div>
+      </Transition>
+    </div>
+  </body>
+
+    <script>
+
+      const app = Vue.createApp({
+        components: {
+          draggable: VueDraggableNext.VueDraggableNext,
+        },
+        data() {
+          return {
+            appItems: [
+              {
+                index: 1,
+                name: 'Test App',
+                icon: 'images/test-app.png'
+              }
+            ],
+            gridArray: [],
+
+            dragging: false,
+
+            menuOpen: false
+          }
+        },
+
+        methods: {
+          getAppFromIndex(index) {
+            return this.appItems.find(item => item.index === index);
+          },
+
+          clickOutsideMenu() {
+            this.menuOpen = false;
+          },
+
+          moveApp(event) {
+            if (this.appItems.some(item => item.index === event.moved.oldIndex + 1)) {
+              const appItem = this.appItems.find(item => item.index === event.moved.oldIndex + 1);
+
+              appItem.index = event.moved.newIndex + 1;
+
+              this.createNewGridArray(this.gridArray.length)
+            }
+          },
+
+          createNewGridArray(amount) {
+            this.gridArray = [];
+
+            for (let i = 1; i <= amount; i++) {
+              this.gridArray.push(i);
+            }
+          }
+        },
+
+        computed: {
+          gridArrayComputed() {
+            return this.gridArray;
+          }
+        },
+
+        mounted() {
+          const appsGrid = document.getElementById('appsGrid');
+
+          setInterval(() => {
+            const appGridHeight = appsGrid.offsetHeight;
+            const appGridWidth = appsGrid.offsetWidth;
+
+            const appsPerRow = Math.floor(appGridWidth / 85);
+            const appsPerColumn = Math.floor(appGridHeight / 105);
+
+            if (this.gridArray.length !== appsPerRow * appsPerColumn) {
+              this.createNewGridArray(appsPerRow * appsPerColumn);
+            }
+          }, 10);
+        }
+      });
+
+      const vuetify = Vuetify.createVuetify({
+        theme: {
+          defaultTheme: 'light'
+        }
+      });
+
+      app.use(vuetify);
+
+      app.mount('#vueApp');
+    </script>
+</html>

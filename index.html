@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Bossslime | Demos</title>
+
+        <script src="./lib/Vue3/vue.global.min.js"></script>
+
+        <link rel="stylesheet" href="./lib/Vue3/vuetify/vuetify.min.css" />
+        <script src="./lib/Vue3/vuetify/vuetify.min.js"></script>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="description" content="Welcome to a world of Bossslimes imagination">
+        <meta name="keywords" content="HTML, CSS, JavaScript, Bossslime, VueJS, Freelancer, Wireframes, Concept">
+        <meta name="author" content="Bossslime">
+
+        <style>
+            :root {
+                --background-main: #212121;
+                --background-main-faded: rgba(36, 36, 36, 1);
+
+                --background-secondary: #121212;
+            }
+
+
+            html, body                               { height: 100%; width: 100%; overflow: auto; margin: 0; font-family: 'Saira', sans-serif; }
+
+            #vueApp                                  { height: 100%; width: 100%;  }
+
+            nav                                      { position: sticky; top: 0; z-index: 10; width: 100%; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; background-color: var(--background-main); border-bottom: 1px solid var(--background-secondary); color: white; }
+
+            .description-container                   { width: 100%; height: auto; color: white; padding: 5px 15px; text-align: center; background-color: var(--background-main-faded); }
+
+            .body-container                          { width: 100%; height: auto; padding: 25px 15px 0 15px; display: flex; flex-direction: row; justify-content: space-evenly; gap: 15px; flex-wrap: wrap; background-color: var(--background-main-faded); }
+
+            .website-card                            { max-width: 100%; width: 300px; height: 300px; display: flex; flex-direction: column; border-radius: 5px 5px 0 0; color: white; overflow: hidden; }
+            .website-card:hover                      { cursor: pointer; }
+
+            .website-card-image                      { width: 100%; height: 150px; object-fit: cover; border-radius: 5px 5px 0 0; }
+            .website-card-info                       { width: 100%; height: 150px; padding: 5px 10px; z-index: 1; display: flex; flex-direction: column; box-shadow: 0 -10px 20px 25px var(--background-main); background-color: var(--background-main); }
+
+            .website-card-info-button-container      { width: 100%; height: 35%; display: flex; justify-content: end; align-items: center; }
+
+            .footer                                  { width: 100%; height: 40px; display: flex; justify-content: center; align-items: center; color: white; }
+        </style>
+    </head>
+    <body>
+        <div id="vueApp">
+            <v-app>
+                <v-main>
+                    <nav>
+                        <a href="https://bossslime.com" style="color: white; text-decoration: none !important;">
+                            <h1>Bossslime.com</h1>
+                        </a>
+
+                        <v-btn color="info" href="https://bossslime.com">Home</v-btn>
+                    </nav>
+
+                    <div style="height: calc(100% - 60px); width: 100%; background-color: var(--background-main-faded);">
+                        <div class="description-container">
+                            <h2>Bossslime's Demo Projects</h2>
+                            <p>This is a hub for all of my preview/concept websites. When I get bored, I like to work on random webapps to better my skills. I will add any results I like here for the world to see. You can inspect the page source code for any page you wish to view the code for, none of it is uglified.</p>
+                        </div>
+
+                        <div class="body-container">
+                            <a v-for="site of sites" :href="site.url" style="height: fit-content; color: white; text-decoration: none !important;">
+                                <div class="website-card">
+                                    <img :src="site.image" :alt="site.name" class="website-card-image" @click="window.location.href = site.url" />
+
+                                    <div class="website-card-info">
+                                        <div style="height: 65%">
+                                            <h3>{{ site.name }}</h3>
+                                            <p style="font-size: 14px">{{ site.description }}</p>
+                                        </div>
+
+                                        <div class="website-card-info-button-container">
+                                            <v-btn color="info" @click="window.location.href = site.url">View</v-btn>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+
+                            <div class="footer">
+                                <p>&copy; Bossslime.com 2020-{{ currentYear }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </v-main>
+            </v-app>
+        </div>
+    </body>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    currentYear: new Date().getFullYear(),
+
+                    sites: [
+                        {
+                            name: 'BossslimeTube',
+                            url: 'BossslimeTube',
+                            description: 'A version of the YouTube UI I made to test opacity and blur.',
+                            image: 'images/preview-BossslimeTube.png'
+                        },
+                        {
+                            name: 'Game View',
+                            url: 'GameView',
+                            description: 'A concept I made for a game view that could be seen on a game store.',
+                            image: 'images/preview-GameView.png'
+                        },
+                        {
+                            name: 'VueExample',
+                            url: 'VueExample',
+                            description: 'A simple example of Vue.js and a few of its use cases. CTRL + U for SRC.',
+                            image: 'images/preview-VueExample.png'
+                        },
+                        {
+                            name: 'Desktop View',
+                            url: 'DesktopView',
+                            description: 'This is a concept I made based on the Windows 10/11 desktops. Its really simple but I was testing out some CSS.',
+                            image: 'images/preview-DesktopView.png'
+                        }
+                    ]
+                }
+            }
+        });
+
+        const vuetify = Vuetify.createVuetify({
+            theme: {
+                defaultTheme: 'light'
+            }
+        });
+
+        app.use(vuetify);
+
+        app.mount('#vueApp');
+    </script>
+</html>
