@@ -40,6 +40,11 @@
             .body-counter-inner-header       { width: 100%; height: 80%; display: flex; justify-content: center; align-items: center; }
             .body-counter-inner-footer       { width: 100%; height: 20%; display: flex; justify-content: center; }
 
+            .body-counter-column-container   { display: flex; flex-direction: column; align-items: center; gap: 25px; }
+
+            .body-video-container            { width: 350px; display: flex; flex-direction: column; align-items: center; }
+            .body-video-object               { width: 300px; height: 175px; border-radius: 5px; border: 1px solid #d2dbe0; }
+
             /* Navbar Styles */
             nav                              { position: absolute; bottom: 0; z-index: 100; height: auto; max-height: calc(100% - 25px); width: 100%; display: flex; flex-direction: column; align-items: center; color: var(--background-main); }
             .nav-header                      { height: 40px; width: 150px; cursor: pointer; display: flex; justify-content: center; align-items: center; border-radius: 5px 5px 0 0; background-color: var(--navbar-main); border-top: 2px solid var(--navbar-main-faded); border-left: 2px solid var(--navbar-main-faded); border-right: 2px solid var(--navbar-main-faded); }
@@ -75,7 +80,9 @@
                 </div>
 
                 <div class="body-content-container">
-                    <div style="width: 350px; height: 0;"></div>
+                    <!-- Twitter Embed -->
+                    <a class="twitter-timeline" data-width="350" data-height="500" href="https://twitter.com/gawrgura?ref_src=twsrc%5Etfw">Tweets by gawrgura</a>
+                    <!-- Twitter Embed -->
 
                     <div class="body-counter-container">
                         <div class="body-counter-container-inner">
@@ -88,9 +95,12 @@
                         </div>
                     </div>
 
-                    <!-- Twitter Embed -->
-                    <a class="twitter-timeline" data-width="350" data-height="500" href="https://twitter.com/gawrgura?ref_src=twsrc%5Etfw">Tweets by gawrgura</a>
-                    <!-- Twitter Embed -->
+                    <div class="body-video-container">
+                        <h2>Latest Streams</h2>
+                        <div class="body-video-object">
+
+                        </div>
+                    </div>
 
                 </div>
             </div>
@@ -115,7 +125,7 @@
 
         app.component('navbar', {
             template: `
-                <nav>
+                <nav v-click-outside="closeNavbar">
                   <div class="nav-header" @click="isNavbarOpen = !isNavbarOpen">
                     <svg xmlns="http://www.w3.org/2000/svg" :style="{'transform': isNavbarOpen ? 'rotate(180deg)' : ''}" height="35px" fill="var(--background-main)" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"/></svg>
                   </div>
@@ -193,6 +203,11 @@
                             ]
                         }
                     ]
+                }
+            },
+            methods: {
+                closeNavbar() {
+                    this.isNavbarOpen = false;
                 }
             }
         });
