@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Gawr Gura | When Did They Stream Last</title>
+
+        <script src="../lib/Vue3/vue.global.min.js"></script>
+
+        <link rel="stylesheet" href="../lib/Vue3/vuetify/vuetify.min.css" />
+        <script src="../lib/Vue3/vuetify/vuetify.min.js"></script>
+
+
+        <script src="https://apis.google.com/js/platform.js"></script>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        <style>
+            :root {
+                --background-main: #f4f2ee;
+
+                --navbar-main: #212121;
+                --navbar-main-faded: rgba(45, 45, 45, 1);
+
+                --navbar-secondary: #121212;
+                --navbar-secondary-faded: rgba(18, 18, 18, 0.5);
+
+                --counter-gradient: linear-gradient(90deg, rgba(127,228,246,1) 0%, rgba(235,241,239,1) 24%, rgba(226,240,240,1) 43%, rgba(244,242,238,1) 50%, rgba(226,240,240,1) 57%, rgba(235,241,239,1) 76%, rgba(127,228,246,1) 100%);
+            }
+
+            html, body                       { height: 100%; width: 100%; overflow: hidden; margin: 0; font-family: 'Saira', sans-serif; }
+
+            #vueApp                          { height: 100%; width: 100%; background-color: var(--background-main); }
+
+            .body-container                  { width: 100%; height: calc(100% - 15px); overflow-y: auto; display: flex; flex-direction: column; align-items: center }
+            .body-header-container           { width: 100%; height: 65px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 15px; }
+            .body-channel-container          { width: 100%; height: 75px; display: flex; justify-content: center; align-items: center; }
+            .body-content-container          { width: 100%; height: auto; display: flex; flex-direction: row; gap: 15px; justify-content: space-between; flex-wrap: wrap; padding: 0 25px; }
+
+            .body-counter-container          { position: relative; width: 400px; height: 500px; max-width: 100%; display: flex; justify-content: center; align-items: center; border-radius: 5px; background: var(--counter-gradient); }
+            .body-counter-container-inner    { width: calc(100% - 4px); height: calc(100% - 4px); border-radius: 4px; display: flex; flex-direction: column; background-color: var(--background-main); }
+            .body-counter-inner-header       { width: 100%; height: 80%; display: flex; justify-content: center; align-items: center; }
+            .body-counter-inner-footer       { width: 100%; height: 20%; display: flex; justify-content: center; }
+
+            /* Navbar Styles */
+            nav                              { position: absolute; bottom: 0; z-index: 100; height: auto; max-height: calc(100% - 25px); width: 100%; display: flex; flex-direction: column; align-items: center; color: var(--background-main); }
+            .nav-header                      { height: 40px; width: 150px; cursor: pointer; display: flex; justify-content: center; align-items: center; border-radius: 5px 5px 0 0; background-color: var(--navbar-main); border-top: 2px solid var(--navbar-main-faded); border-left: 2px solid var(--navbar-main-faded); border-right: 2px solid var(--navbar-main-faded); }
+            .nav-body                        { height: 15px; width: 100%; display: flex; flex-direction: column; border-radius: 5px 5px 0 0; background-color: var(--navbar-main); transition: height 500ms ease; }
+
+            .nav-body-content-container      { height: calc(100% - 15px - 35px); width: 100%; margin-top: 15px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
+            .nav-body-section-header         { width: 20%; display: flex; justify-content: center; align-items: center; border-bottom: 2px solid var(--navbar-secondary-faded) }
+            .nav-body-section-gen-header     { width: 20%; display: flex; justify-content: center; align-items: center;}
+            .nav-body-section-body           { width: 100%; display: flex; flex-direction: row; flex-wrap: wrap; gap: 15px; justify-content: space-evenly; align-items: center; }
+
+            .nav-body-object                 { position: relative; height: 250px; width: 200px; display: flex; flex-direction: column; align-items: center; border-radius: 5px; background-color: var(--navbar-secondary-faded); }
+            .nav-body-object:hover           { cursor: pointer; }
+            .nav-body-object-image           { height: 50%; object-fit: cover; }
+
+            .nav-body-footer-container       { height: 35px; display: flex; justify-content: center; align-items: center; opacity: 0.45; overflow: hidden; }
+        </style>
+    </head>
+    <body>
+        <div id="vueApp">
+            <div class="body-container">
+                <div class="body-header-container">
+                    <p></p>
+                    <a href="#" target="_blank"><v-btn variant="outlined" color="info">
+                        API Docs
+                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 5px;" fill="#1f86d8" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M352 0c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9L370.7 96 201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L416 141.3l41.4 41.4c9.2 9.2 22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6V32c0-17.7-14.3-32-32-32H352zM80 32C35.8 32 0 67.8 0 112V432c0 44.2 35.8 80 80 80H400c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32V432c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16H192c17.7 0 32-14.3 32-32s-14.3-32-32-32H80z"/></svg>
+                    </v-btn></a>
+                </div>
+
+                <div class="body-channel-container">
+                    <!-- YT Channel Embed -->
+                    <div class="g-ytsubscribe" data-channelid="UCoSrY_IQQVpmIRZ9Xf-y93g" data-layout="full" data-count="default"></div>
+                    <!-- YT Channel Embed -->
+                </div>
+
+                <div class="body-content-container">
+                    <div style="width: 350px; height: 0;"></div>
+
+                    <div class="body-counter-container">
+                        <div class="body-counter-container-inner">
+                            <div class="body-counter-inner-header">
+                                <h1 style="font-size: 175px">1000</h1>
+                            </div>
+                            <div class="body-counter-inner-footer">
+                                <h2 style="text-align: center;">Days Since The Last Gawr Gura stream.</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Twitter Embed -->
+                    <a class="twitter-timeline" data-width="350" data-height="500" href="https://twitter.com/gawrgura?ref_src=twsrc%5Etfw">Tweets by gawrgura</a>
+                    <!-- Twitter Embed -->
+
+                </div>
+            </div>
+
+            <navbar></navbar>
+        </div>
+    </body>
+
+    <script src="./components/navbar.js"></script>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    lastStream: null
+                }
+            },
+            mounted() {
+                //Get information from the API
+            }
+        });
+
+        app.component('navbar', {
+            template: `
+                <nav>
+                  <div class="nav-header" @click="isNavbarOpen = !isNavbarOpen">
+                    <svg xmlns="http://www.w3.org/2000/svg" :style="{'transform': isNavbarOpen ? 'rotate(180deg)' : ''}" height="35px" fill="var(--background-main)" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"/></svg>
+                  </div>
+
+                  <div class="nav-body" :style="{'height': isNavbarOpen ? '750px' : '15px'}">
+                    <div class="nav-body-content-container">
+                      <div class="nav-body-section-header">
+                        <h1 style="font-size: 32px;">Generations</h1>
+                      </div>
+
+                      <template v-for="gen in gens">
+                        <div class="nav-body-section-gen-header">
+                          <h2>{{ gen.name }}</h2>
+                        </div>
+
+                        <div class="nav-body-section-body">
+                          <template v-for="member in gen.members">
+                            <div class="nav-body-object">
+                              <img class="nav-body-object-image" :src="member.picture" />
+
+                              <!-- Divider -->
+                              <div style="width: 50%; height: 2px; background-color: var(--navbar-main);"></div>
+
+                              <h2>{{ member.name }}</h2>
+
+                              <v-btn color="info" style="position: absolute; bottom: 10px; right: 10px;">
+                                View
+                              </v-btn>
+                            </div>
+                          </template>
+                        </div>
+                      </template>
+                    </div>
+
+                    <div class="nav-body-footer-container" :style="{'height': isNavbarOpen ? '35px' : '0'}">
+                      <p>&copy; Bossslime.com 2020-{{ currentYear }}</p>
+                    </div>
+                  </div>
+                </nav>
+            `,
+            data() {
+                return {
+                    isNavbarOpen: false,
+                    currentYear: new Date().getFullYear(),
+
+                    gens: [
+                        {
+                            name: 'Myth',
+                            members: [
+                                {
+                                    name: 'Gawr Gura',
+                                    comingSoon: false,
+                                    picture: './images/gawr_gura.png'
+                                },
+                                {
+                                    name: 'Ninomae Ina\'nis',
+                                    comingSoon: true,
+                                    picture: './images/ninomae_inanis.png'
+                                },
+                                {
+                                    name: 'Amelia Watson',
+                                    comingSoon: true,
+                                    picture: './images/amelia_watson.png'
+                                },
+                                {
+                                    name: 'Mori Calliope',
+                                    comingSoon: true,
+                                    picture: './images/calliope_mori.png'
+                                },
+                                {
+                                    name: 'Takanashi Kiara',
+                                    comingSoon: true,
+                                    picture: './images/takanashi_kiara.png'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        });
+
+        const vuetify = Vuetify.createVuetify({
+            theme: {
+                defaultTheme: 'light'
+            }
+        });
+
+        app.use(vuetify);
+
+        app.mount('#vueApp');
+    </script>
+</html>
