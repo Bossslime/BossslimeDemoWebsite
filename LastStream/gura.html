@@ -33,17 +33,18 @@
             .body-container                  { width: 100%; height: calc(100% - 15px); overflow-y: auto; display: flex; flex-direction: column; align-items: center }
             .body-header-container           { width: 100%; height: 65px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 15px; }
             .body-channel-container          { width: 100%; height: 75px; display: flex; justify-content: center; align-items: center; }
-            .body-content-container          { width: 100%; height: auto; margin-top: 15px;  display: flex; flex-direction: row; gap: 15px; justify-content: space-between; flex-wrap: wrap; padding: 0 25px 55px 25px; }
+            .body-content-container-desktop  { width: 100%; height: auto; margin-top: 15px;  display: flex; flex-direction: row; gap: 15px; justify-content: space-evenly; align-items: center; flex-wrap: wrap; padding: 0 15px 55px 15px; }
+            .body-content-container-mobile   { width: 100%; height: auto; margin-top: 15px;  display: none; flex-direction: column; gap: 15px; justify-content: space-evenly; align-items: center; flex-wrap: wrap; padding: 0 15px 55px 15px; }
 
-            .body-counter-container          { position: relative; width: 400px; height: 500px; max-width: 100%; display: flex; justify-content: center; align-items: center; border-radius: 5px; background: var(--counter-gradient); }
+            .body-counter-container          { width: 400px; max-width: 100%; height: 500px; display: flex; justify-content: center; align-items: center; border-radius: 5px; background: var(--counter-gradient); }
             .body-counter-container-inner    { width: calc(100% - 6px); height: calc(100% - 6px); border-radius: 4px; display: flex; flex-direction: column; background-color: var(--background-main); }
             .body-counter-inner-header       { width: 100%; height: 80%; display: flex; justify-content: center; align-items: center; }
             .body-counter-inner-footer       { width: 100%; height: 20%; display: flex; justify-content: center; }
 
-            .body-counter-column-container   { display: flex; flex-direction: column; align-items: center; gap: 25px; }
+            .body-counter-column-container   { display: flex; max-width: 100%; flex-direction: column; align-items: center; gap: 25px; }
 
-            .body-video-container            { width: 350px; display: flex; flex-direction: column; align-items: center; }
-            .body-video-object               { width: 300px; height: 175px; border-radius: 5px; border: 1px solid #d2dbe0; }
+            .body-video-container            { width: 350px; max-width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+            .body-video-object               { width: 350px; max-width: 100%; height: 175px; border: 3px solid #d2dbe0; display: flex; justify-content: center; align-items: center; }
 
             /* Navbar Styles */
             nav                              { position: absolute; bottom: 0; z-index: 100; height: auto; max-height: calc(100% - 25px); width: 100%; display: flex; flex-direction: column; align-items: center; color: var(--background-main); }
@@ -60,6 +61,17 @@
             .nav-body-object-image           { height: 50%; object-fit: cover; }
 
             .nav-body-footer-container       { height: 35px; display: flex; justify-content: center; align-items: center; opacity: 0.45; overflow: hidden; }
+
+            @media (max-width: 1200px) {
+                .body-content-container-desktop { display: none; }
+                .body-content-container-mobile  { display: flex; }
+            }
+
+
+            audio::-webkit-media-controls-play-button,
+            audio::-webkit-media-controls-panel {
+                background-color: var(--background-main);
+            }
         </style>
     </head>
     <body>
@@ -79,16 +91,22 @@
                     <!-- YT Channel Embed -->
                 </div>
 
-                <div class="body-content-container">
-                    <!-- Twitter Embed -->
-                    <a class="twitter-timeline" data-width="350" data-height="500" href="https://twitter.com/gawrgura?ref_src=twsrc%5Etfw">Tweets by gawrgura</a>
-                    <!-- Twitter Embed -->
+                <div class="body-content-container-desktop" id="desktop-container">
+
+                    <div class="body-video-container">
+                        <h2>Latest Streams</h2>
+                        <div class="body-video-object" v-for="video of info.videos">
+                            <iframe width="345" height="170" :src="'https://www.youtube.com/embed/' + video.id + '?si=dPPN76IfoYkrbqXx'" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+
+                        <v-btn color="info" target="_blank" href="https://www.youtube.com/@GawrGura/streams">More</v-btn>
+                    </div>
 
                     <div class="body-counter-column-container">
                         <div class="body-counter-container">
                             <div class="body-counter-container-inner">
                                 <div class="body-counter-inner-header">
-                                    <h1 style="font-size: 175px">1000</h1>
+                                    <h1 style="font-size: 150px">{{ info.daysSinceLastStream }}</h1>
                                 </div>
                                 <div class="body-counter-inner-footer">
                                     <h2 style="text-align: center;">Days Since The Last Gawr Gura stream.</h2>
@@ -101,13 +119,53 @@
                         <v-btn color="info" icon variant="text" @click="getRandomNoise">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="var(--navbar-main)" height="24px" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M533.6 32.5C598.5 85.2 640 165.8 640 256s-41.5 170.7-106.4 223.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C557.5 398.2 592 331.2 592 256s-34.5-142.2-88.7-186.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM473.1 107c43.2 35.2 70.9 88.9 70.9 149s-27.7 113.8-70.9 149c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C475.3 341.3 496 301.1 496 256s-20.7-85.3-53.2-111.8c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zm-60.5 74.5C434.1 199.1 448 225.9 448 256s-13.9 56.9-35.4 74.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C393.1 284.4 400 271 400 256s-6.9-28.4-17.7-37.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM301.1 34.8C312.6 40 320 51.4 320 64V448c0 12.6-7.4 24-18.9 29.2s-25 3.1-34.4-5.3L131.8 352H64c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64h67.8L266.7 40.1c9.4-8.4 22.9-10.4 34.4-5.3z"/></svg>
                         </v-btn>
+
+                        <audio id="audio-el-1" type="audio/mp3" controls volume="0.35"></audio>
+                    </div>
+
+                    <div class="body-video-container">
+                        <h2>Latest Posts</h2>
+                        <!-- Twitter Embed -->
+                        <a class="twitter-timeline" data-width="350" data-height="500" style="width: 250px" href="https://twitter.com/gawrgura?ref_src=twsrc%5Etfw">Tweets by gawrgura</a>
+                        <!-- Twitter Embed -->
+                    </div>
+
+                </div>
+
+                <div class="body-content-container-mobile">
+                    <div class="body-counter-column-container">
+                        <div class="body-counter-container">
+                            <div class="body-counter-container-inner">
+                                <div class="body-counter-inner-header">
+                                    <h1 style="font-size: 150px">{{ info.daysSinceLastStream }}</h1>
+                                </div>
+                                <div class="body-counter-inner-footer">
+                                    <h2 style="text-align: center;">Days Since The Last Gawr Gura stream.</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2>Play A Gura Noise</h2>
+
+                        <v-btn color="info" icon variant="text" @click="getRandomNoise">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="var(--navbar-main)" height="24px" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M533.6 32.5C598.5 85.2 640 165.8 640 256s-41.5 170.7-106.4 223.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C557.5 398.2 592 331.2 592 256s-34.5-142.2-88.7-186.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM473.1 107c43.2 35.2 70.9 88.9 70.9 149s-27.7 113.8-70.9 149c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C475.3 341.3 496 301.1 496 256s-20.7-85.3-53.2-111.8c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zm-60.5 74.5C434.1 199.1 448 225.9 448 256s-13.9 56.9-35.4 74.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C393.1 284.4 400 271 400 256s-6.9-28.4-17.7-37.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM301.1 34.8C312.6 40 320 51.4 320 64V448c0 12.6-7.4 24-18.9 29.2s-25 3.1-34.4-5.3L131.8 352H64c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64h67.8L266.7 40.1c9.4-8.4 22.9-10.4 34.4-5.3z"/></svg>
+                        </v-btn>
+
+                        <audio id="audio-el-2" type="audio/mp3" controls volume="0.35"></audio>
                     </div>
 
                     <div class="body-video-container">
                         <h2>Latest Streams</h2>
-                        <div class="body-video-object">
-
+                        <div class="body-video-object" v-for="video of info.videos">
+                            <iframe width="345" height="170" :src="'https://www.youtube.com/embed/' + video.id + '?si=dPPN76IfoYkrbqXx'" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                         </div>
+                    </div>
+
+                    <div class="body-video-container">
+                        <h2>Latest Posts</h2>
+                        <!-- Twitter Embed -->
+                        <a class="twitter-timeline" data-width="350" data-height="500" style="width: 250px" href="https://twitter.com/gawrgura?ref_src=twsrc%5Etfw">Tweets by gawrgura</a>
+                        <!-- Twitter Embed -->
                     </div>
 
                 </div>
@@ -117,22 +175,48 @@
         </div>
     </body>
 
-    <script src="./components/navbar.js"></script>
-
     <script>
         const app = Vue.createApp({
             data() {
                 return {
-                    lastStream: null
+                    info: {
+                        id: 'UCoSrY_IQQVpmIRZ9Xf-y93g',
+                        name: 'Gawr Gura',
+                        videos: [],
+                        daysSinceLastStream: 0
+                    }
                 }
             },
             methods: {
                 getRandomNoise() {
+                    const audioEl = document.getElementById('audio-el-1');
+                    const audioElTwo = document.getElementById('audio-el-2');
 
+                    if (getComputedStyle(document.getElementById('desktop-container')).display === 'none') {
+                        audioEl.pause();
+                        audioEl.src = '';
+
+                        audioElTwo.pause();
+                        audioElTwo.src = '';
+                        audioElTwo.src = 'http://localhost:3000/get/noises/gura';
+                        audioElTwo.play();
+                    } else {
+                        audioElTwo.pause();
+                        audioElTwo.src = '';
+
+                        audioEl.pause();
+                        audioEl.src = '';
+                        audioEl.src = 'http://localhost:3000/get/noises/gura';
+                        audioEl.play();
+                    }
                 }
             },
             mounted() {
-                //Get information from the API
+                fetch('http://localhost:3000/get/lastStream/gura')
+                    .then(res => res.text())
+                    .then(data => {
+                        this.info = JSON.parse(data);
+                    });
             }
         });
 
