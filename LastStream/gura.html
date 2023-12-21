@@ -31,10 +31,10 @@
             #vueApp                          { height: 100%; width: 100%; background-color: var(--background-main); }
 
             .body-container                  { width: 100%; height: calc(100% - 15px); overflow-y: auto; display: flex; flex-direction: column; align-items: center }
-            .body-header-container           { width: 100%; height: 65px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 15px; }
+            .body-header-container           { width: 100%; min-height: 65px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 15px; }
             .body-channel-container          { width: 100%; height: 75px; display: flex; justify-content: center; align-items: center; }
-            .body-content-container-desktop  { width: 100%; height: auto; margin-top: 15px;  display: flex; flex-direction: row; gap: 15px; justify-content: space-evenly; align-items: center; flex-wrap: wrap; padding: 0 15px 55px 15px; }
-            .body-content-container-mobile   { width: 100%; height: auto; margin-top: 15px;  display: none; flex-direction: column; gap: 15px; justify-content: space-evenly; align-items: center; flex-wrap: wrap; padding: 0 15px 55px 15px; }
+            .body-content-container-desktop  { width: 100%; height: auto; margin-top: 15px;  display: flex; flex-direction: row; gap: 15px; justify-content: space-evenly; flex-wrap: wrap; padding: 0 15px 55px 15px; }
+            .body-content-container-mobile   { width: 100%; height: auto; margin-top: 15px;  display: none; flex-direction: column; gap: 15px; align-items: center; flex-wrap: wrap; padding: 0 15px 55px 15px; }
 
             .body-counter-container          { width: 400px; max-width: 100%; height: 500px; display: flex; justify-content: center; align-items: center; border-radius: 5px; background: var(--counter-gradient); }
             .body-counter-container-inner    { width: calc(100% - 6px); height: calc(100% - 6px); border-radius: 4px; display: flex; flex-direction: column; background-color: var(--background-main); }
@@ -87,7 +87,7 @@
 
                 <div class="body-channel-container">
                     <!-- YT Channel Embed -->
-                    <div class="g-ytsubscribe" data-channelid="UCoSrY_IQQVpmIRZ9Xf-y93g" data-layout="full" data-count="default"></div>
+                    <div class="g-ytsubscribe" :data-channelid="info.id" data-layout="full" data-count="default"></div>
                     <!-- YT Channel Embed -->
                 </div>
 
@@ -109,12 +109,12 @@
                                     <h1 style="font-size: 150px">{{ info.daysSinceLastStream }}</h1>
                                 </div>
                                 <div class="body-counter-inner-footer">
-                                    <h2 style="text-align: center;">Days Since The Last Gawr Gura stream.</h2>
+                                    <h2 style="text-align: center;">Days Since The Last {{ info.name }} stream.</h2>
                                 </div>
                             </div>
                         </div>
 
-                        <h2>Play A Gura Noise</h2>
+                        <h2>Play A {{ shortName }} Noise</h2>
 
                         <v-btn color="info" icon variant="text" @click="getRandomNoise">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="var(--navbar-main)" height="24px" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M533.6 32.5C598.5 85.2 640 165.8 640 256s-41.5 170.7-106.4 223.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C557.5 398.2 592 331.2 592 256s-34.5-142.2-88.7-186.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM473.1 107c43.2 35.2 70.9 88.9 70.9 149s-27.7 113.8-70.9 149c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C475.3 341.3 496 301.1 496 256s-20.7-85.3-53.2-111.8c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zm-60.5 74.5C434.1 199.1 448 225.9 448 256s-13.9 56.9-35.4 74.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C393.1 284.4 400 271 400 256s-6.9-28.4-17.7-37.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM301.1 34.8C312.6 40 320 51.4 320 64V448c0 12.6-7.4 24-18.9 29.2s-25 3.1-34.4-5.3L131.8 352H64c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64h67.8L266.7 40.1c9.4-8.4 22.9-10.4 34.4-5.3z"/></svg>
@@ -140,12 +140,12 @@
                                     <h1 style="font-size: 150px">{{ info.daysSinceLastStream }}</h1>
                                 </div>
                                 <div class="body-counter-inner-footer">
-                                    <h2 style="text-align: center;">Days Since The Last Gawr Gura stream.</h2>
+                                    <h2 style="text-align: center;">Days Since The Last {{ info.name }} stream.</h2>
                                 </div>
                             </div>
                         </div>
 
-                        <h2>Play A Gura Noise</h2>
+                        <h2>Play A {{ shortName }} Noise</h2>
 
                         <v-btn color="info" icon variant="text" @click="getRandomNoise">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="var(--navbar-main)" height="24px" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M533.6 32.5C598.5 85.2 640 165.8 640 256s-41.5 170.7-106.4 223.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C557.5 398.2 592 331.2 592 256s-34.5-142.2-88.7-186.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM473.1 107c43.2 35.2 70.9 88.9 70.9 149s-27.7 113.8-70.9 149c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C475.3 341.3 496 301.1 496 256s-20.7-85.3-53.2-111.8c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zm-60.5 74.5C434.1 199.1 448 225.9 448 256s-13.9 56.9-35.4 74.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C393.1 284.4 400 271 400 256s-6.9-28.4-17.7-37.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM301.1 34.8C312.6 40 320 51.4 320 64V448c0 12.6-7.4 24-18.9 29.2s-25 3.1-34.4-5.3L131.8 352H64c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64h67.8L266.7 40.1c9.4-8.4 22.9-10.4 34.4-5.3z"/></svg>
@@ -186,6 +186,9 @@
                         daysSinceLastStream: 0
                     },
 
+                    shortName: 'Gura',
+                    oshiName: 'gura',
+
                     endpoint: 'https://api.bossslime.com'
                 }
             },
@@ -200,7 +203,7 @@
 
                         audioElTwo.pause();
                         audioElTwo.src = '';
-                        audioElTwo.src = this.endpoint + '/get/noises/gura';
+                        audioElTwo.src = this.endpoint + '/get/noises/' + this.oshiName;
                         audioElTwo.play();
                     } else {
                         audioElTwo.pause();
@@ -208,17 +211,29 @@
 
                         audioEl.pause();
                         audioEl.src = '';
-                        audioEl.src = this.endpoint + '/get/noises/gura';
+                        audioEl.src = this.endpoint + '/get/noises/' + this.oshiName;
                         audioEl.play();
                     }
+                },
+
+                fetchInfo() {
+                    fetch(this.endpoint + '/get/info/' + this.oshiName)
+                        .then(res => res.text())
+                        .then(data => {
+                            try {
+                                this.info = JSON.parse(data);
+                            }catch (e) {
+                                this.fetchInfo();
+                            }
+                        });
                 }
             },
             mounted() {
-                fetch(this.endpoint + '/get/info/gura')
-                    .then(res => res.text())
-                    .then(data => {
-                        this.info = JSON.parse(data);
-                    });
+                this.fetchInfo();
+
+                setInterval(() => {
+                    this.fetchInfo();
+                }, 600000);
             }
         });
 
@@ -242,18 +257,22 @@
 
                         <div class="nav-body-section-body">
                           <template v-for="member in gen.members">
-                            <div class="nav-body-object">
-                              <img class="nav-body-object-image" :src="member.picture" />
+                            <a :href="member.comingSoon ? '#' : member.page" style="text-decoration: none; color: var(--background-main)">
+                                <div class="nav-body-object">
+                                  <img class="nav-body-object-image" :src="member.picture" />
 
-                              <!-- Divider -->
-                              <div style="width: 50%; height: 2px; background-color: var(--navbar-main);"></div>
+                                  <!-- Divider -->
+                                  <div style="width: 50%; height: 2px; background-color: var(--navbar-main);"></div>
 
-                              <h2>{{ member.name }}</h2>
+                                  <h2>{{ member.name }}</h2>
 
-                              <v-btn color="info" style="position: absolute; bottom: 10px; right: 10px;">
-                                View
-                              </v-btn>
-                            </div>
+                                  <v-btn :href="member.page" v-if="!member.comingSoon" color="info" style="position: absolute; bottom: 10px; right: 10px;">
+                                    View
+                                  </v-btn>
+
+                                  <h4 v-if="member.comingSoon" style="position: absolute; bottom: 10px; right: 10px;">Coming Soon...</h4>
+                                </div>
+                            </a>
                           </template>
                         </div>
                       </template>
@@ -277,27 +296,32 @@
                                 {
                                     name: 'Gawr Gura',
                                     comingSoon: false,
-                                    picture: './images/gawr_gura.png'
+                                    picture: './images/gawr_gura.png',
+                                    page: 'gura.html'
                                 },
                                 {
                                     name: 'Ninomae Ina\'nis',
                                     comingSoon: true,
-                                    picture: './images/ninomae_inanis.png'
+                                    picture: './images/ninomae_inanis.png',
+                                    page: '#'
                                 },
                                 {
                                     name: 'Amelia Watson',
-                                    comingSoon: true,
-                                    picture: './images/amelia_watson.png'
+                                    comingSoon: false,
+                                    picture: './images/amelia_watson.png',
+                                    page: 'amelia.html'
                                 },
                                 {
                                     name: 'Mori Calliope',
-                                    comingSoon: true,
-                                    picture: './images/calliope_mori.png'
+                                    comingSoon: false,
+                                    picture: './images/calliope_mori.png',
+                                    page: 'calliope.html'
                                 },
                                 {
                                     name: 'Takanashi Kiara',
-                                    comingSoon: true,
-                                    picture: './images/takanashi_kiara.png'
+                                    comingSoon: false,
+                                    picture: './images/takanashi_kiara.png',
+                                    page: 'kiara.html'
                                 }
                             ]
                         }
