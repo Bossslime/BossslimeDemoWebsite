@@ -227,7 +227,9 @@
                         try {
                             this.info = JSON.parse(data);
                         }catch (e) {
-                            this.fetchInfo();
+                            if (res.status !== 200) {
+                                this.fetchInfo();
+                            }
                         }
                     });
             }

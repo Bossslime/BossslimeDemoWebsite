@@ -25,7 +25,7 @@
             --navbar-secondary: #121212;
             --navbar-secondary-faded: rgba(18, 18, 18, 0.5);
 
-            --counter-gradient: linear-gradient(90deg, rgba(127,228,246,1) 0%, rgba(235,241,239,1) 24%, rgba(226,240,240,1) 43%, rgba(244,242,238,1) 50%, rgba(226,240,240,1) 57%, rgba(235,241,239,1) 76%, rgba(127,228,246,1) 100%);
+            --counter-gradient: linear-gradient(90deg, rgba(248,171,194,1) 0%, rgba(244,233,233,1) 33%, rgba(245,218,224,1) 40%, rgba(244,242,238,1) 50%, rgba(245,218,224,1) 60%, rgba(244,233,233,1) 67%, rgba(248,171,194,1) 100%);
         }
 
         html, body                       { height: 100%; width: 100%; overflow: hidden; margin: 0; font-family: 'Saira', sans-serif; }
@@ -227,7 +227,9 @@
                         try {
                             this.info = JSON.parse(data);
                         }catch (e) {
-                            this.fetchInfo();
+                            if (res.status !== 200) {
+                                this.fetchInfo();
+                            }
                         }
                     });
             }
