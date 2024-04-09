@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+
+        <script src="../lib/Vue2/vue.min.js"></script>
+
+        <style>
+            :root                                   { --size: 100px; --food-size: 50px; --grid-size: 100px }
+
+            html, body                              { width: 100%; height: 100%; margin: 0; font-family: Helvetica; color: white; }
+
+            #vueApp                                 { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow: hidden; background-color: #212121; }
+
+            .menu-container                         { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; gap: 15px; }
+            .menu-button                            { width: 500px; max-width: 100%; height: 100px; display: flex; justify-content: center; align-items: center; border: 5px solid rgba(33, 150, 243, 0.25); font-size: 50px; }
+            .menu-button:hover                      { background-color: rgba(33, 150, 243, 0.25); cursor: pointer; }
+
+            .landscape-container                    { width: fit-content; max-width: 900px; height: fit-content; scale: 50%; display: flex; flex-direction: row; flex-wrap: wrap; border: 1px solid rgba(33, 150, 243, 0.50); transform: rotateX(55deg) rotateZ(35deg); transform-style: preserve-3d; }
+
+            .landscape-grid-object                  { width: calc(var(--grid-size) - 2px); height: calc(var(--grid-size) - 2px); border: 1px solid rgba(33, 150, 243, 0.50); }
+
+            .score                                  { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-size: 100px; }
+
+            .landscape-cube                         { position: absolute; transform-style: preserve-3d; width: var(--size); height: var(--size); transform-origin: calc(var(--size) / 2) calc(var(--size) / 2) calc(var(--size) / 2);}
+            .landscape-cube-side                    { position: absolute; background-color: rgba(255, 0, 0, 1); width: var(--size); height: var(--size); }
+
+            .landscape-food-cube                    { position: absolute; transform-style: preserve-3d; width: var(--food-size); height: var(--food-size); transform-origin: calc(var(--food-size) / 2) calc(var(--food-size) / 2) calc(var(--food-size) / 2); animation: hover 2.5s infinite linear; transition: transform 0.2s linear; }
+            .landscape-food-cube-side               { position: absolute; background-color: rgba(0, 255, 0, 0.75); width: var(--food-size); height: var(--food-size); }
+
+            @keyframes hover {
+                from { transform: rotateZ(0deg) translate3d(0, 0, 0px); }
+                50%  { transform: rotateZ(90deg) translate3d(0, 0, 20px); }
+                to   { transform: rotateZ(180deg) translate3d(0, 0, 0px); }
+            }
+
+
+            .toggle-loader                     { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 10; }
+
+            .loader-container                  { position: absolute; top: 0; left: 0; z-index: 1; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+            .loader-section                    { position: absolute; height: 50%; width: 100%; background-color: rgba(0, 0, 0, 0.25); transition: top 0.5s; overflow: hidden; }
+            .loader-text                       { position: absolute; top: 80px; left: 50%; transform: translateX(-50%);}
+            .loader-text:after                 { animation: loading 1s infinite linear; content: '...'; }
+
+            .loader-landscape-cube                    { position: absolute; transform-style: preserve-3d; width: var(--size); height: var(--size); animation: spin 5s infinite linear; transform-origin: 50px 50px 50px }
+
+            .loader-landscape-cube-side               { position: absolute; background-color: rgba(255, 0, 0, 0.25); width: var(--size); height: var(--size); }
+            /*background-color: rgba(255, 0, 0, 0.25);*/
+
+            @keyframes spin {
+                from { transform: translateX(-50%) rotateX(45deg) rotateY(0deg); }
+                to   { transform: translateX(-50%) rotateX(45deg) rotateY(360deg); }
+            }
+
+            @keyframes loading {
+                from { content: '.'; }
+                50%  { content: '..'; }
+                to   { content: '...'; }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="vueApp">
+            <div v-if="page === 0" class="menu-container">
+                <div class="menu-button" @click="startGame">Start Game</div>
+            </div>
+
+            <div class="landscape-container" v-else-if="page === 2">
+                <div class="score">Score: {{ score }}</div>
+                <div class="landscape-grid-object" v-for="i in 81"></div>
+
+                <div class="landscape-cube" :style="[{'bottom': 'calc(var(--grid-size) * ' + currentY + ')'}, {'left': 'calc(var(--grid-size) * ' + currentX + ')'}, {'transform': getXRotation + ' ' + getYRotation}, {'transition': getTransition}]">
+                    <!-- base -->
+                    <div class="landscape-cube-side"></div>
+
+                    <!-- top -->
+                    <div class="landscape-cube-side" style="transform: translate3d(0, 0, var(--size))"></div>
+
+                    <!-- front -->
+                    <div class="landscape-cube-side" style="transform: rotateX(-90deg); transform-origin: bottom"></div>
+
+                    <!-- back -->
+                    <div class="landscape-cube-side" style="transform: rotateX(90deg); transform-origin: top"></div>
+
+                    <!-- left -->
+                    <div class="landscape-cube-side" style="transform: rotateY(-90deg); transform-origin: left"></div>
+
+                    <!-- right -->
+                    <div class="landscape-cube-side" style="transform: rotateY(90deg); transform-origin: right"></div>
+                </div>
+
+                <div class="landscape-food-cube" :style="[{'left': 'calc(' + (foodX * 100) +'px + 25px)'}, {'bottom': 'calc(' + (foodY * 100) +'px + 25px)'}]">
+                    <!-- base -->
+                    <div class="landscape-food-cube-side"></div>
+
+                    <!-- top -->
+                    <div class="landscape-food-cube-side" style="transform: translate3d(0, 0, var(--food-size))"></div>
+
+                    <!-- front -->
+                    <div class="landscape-food-cube-side" style="transform: rotateX(-90deg); transform-origin: bottom"></div>
+
+                    <!-- back -->
+                    <div class="landscape-food-cube-side" style="transform: rotateX(90deg); transform-origin: top"></div>
+
+                    <!-- left -->
+                    <div class="landscape-food-cube-side" style="transform: rotateY(-90deg); transform-origin: left"></div>
+
+                    <!-- right -->
+                    <div class="landscape-food-cube-side" style="transform: rotateY(90deg); transform-origin: right"></div>
+                </div>
+            </div>
+
+            <loader></loader>
+        </div>
+    </body>
+
+    <script>
+        Vue.component('loader', {
+            template: `
+              <div class="loader-container" >
+                <div class="loader-section" :style="{'top': isLoading ? '0' : '-50%'}">
+                  <div class="loader-landscape-cube" style="bottom: -60px; left: 50%;">
+                    <!-- base -->
+                    <div class="loader-landscape-cube-side"></div>
+
+                    <!-- top -->
+                    <div class="loader-landscape-cube-side" style="transform: translate3d(0, 0, var(--size));"></div>
+
+                    <!-- front -->
+                    <div class="loader-landscape-cube-side" style="transform: rotateX(-90deg); transform-origin: bottom;"></div>
+
+                    <!-- back -->
+                    <div class="loader-landscape-cube-side" style="transform: rotateX(90deg); transform-origin: top;"></div>
+
+                    <!-- left -->
+                    <div class="loader-landscape-cube-side" style="transform: rotateY(-90deg); transform-origin: left;"></div>
+
+                    <!-- right -->
+                    <div class="loader-landscape-cube-side" style="transform: rotateY(90deg); transform-origin: right;"></div>
+                  </div>
+                </div>
+                <div class="loader-section" :style="{'top': isLoading ? '50%' : '100%'}">
+                  <div class="loader-landscape-cube" style="top: -60px; left: 50%; animation-direction: reverse">
+                    <!-- base -->
+                    <div class="loader-landscape-cube-side"></div>
+
+                    <!-- top -->
+                    <div class="loader-landscape-cube-side" style="transform: translate3d(0, 0, var(--size));"></div>
+
+                    <!-- front -->
+                    <div class="loader-landscape-cube-side" style="transform: rotateX(-90deg); transform-origin: bottom;"></div>
+
+                    <!-- back -->
+                    <div class="loader-landscape-cube-side" style="transform: rotateX(90deg); transform-origin: top;"></div>
+
+                    <!-- left -->
+                    <div class="loader-landscape-cube-side" style="transform: rotateY(-90deg); transform-origin: left;"></div>
+
+                    <!-- right -->
+                    <div class="loader-landscape-cube-side" style="transform: rotateY(90deg); transform-origin: right;"></div>
+                  </div>
+
+                  <div class="loader-text">Loading</div>
+                </div>
+              </div>
+            `,
+            data() {
+                return {
+                    isLoading: false
+                }
+            },
+            mounted() {
+                this.$root.$on('packet', (msg) => {
+                    switch (msg.type) {
+                        case 'loader':
+                            this.isLoading = !this.isLoading;
+                            break;
+                    }
+                });
+            }
+        });
+
+
+        const app = new Vue({
+            el: '#vueApp',
+            data() {
+                return {
+                    page: 0,
+
+                    score: 0,
+
+                    max: 9,
+
+                    currentX: 0,
+                    currentY: 0,
+
+                    rotateX: 0,
+                    rotateY: 0,
+
+                    foodX: 8,
+                    foodY: 8,
+
+                    doRotateX: false,
+                    doRotateY: false
+                }
+            },
+            methods: {
+                startGame() {
+                    this.page = 1;
+                    this.toggleLoader();
+
+                    setTimeout(() => {
+                        this.page = 2;
+                        this.toggleLoader();
+                    }, 1000);
+                },
+                checkFruit() {
+                    if (this.currentX === this.foodX && this.currentY === this.foodY) {
+                        setTimeout(() => {
+                            this.score++;
+                            this.newFruit();
+                        }, 400);
+                    }
+                },
+
+                newFruit() {
+                    const x = Math.floor(Math.random() * this.max);
+                    const y = Math.floor(Math.random() * this.max);
+                    if (x === this.currentX && y === this.currentY) {
+                        this.newFruit();
+                    } else {
+                        this.foodX = x;
+                        this.foodY = y;
+                    }
+                },
+
+                toggleLoader() {
+                    this.$root.$emit('packet', { type: 'loader' });
+                }
+            },
+            computed: {
+                getXRotation() {
+                    return 'rotateX(' + this.rotateX + 'deg)';
+                },
+                getYRotation() {
+                    return 'rotateY(' + this.rotateY + 'deg)';
+                },
+                getTransition() {
+                    if (this.doRotateX || this.doRotateY) {
+                        return 'left 0.5s, bottom 0.5s, transform 0.5s';
+                    } else {
+                        return 'left 0.5s, bottom 0.5s';
+                    }
+                }
+            },
+            mounted() {
+                this.newFruit();
+                window.addEventListener('keydown', (e) => {
+                    if (this.doRotateX || this.doRotateY) return;
+
+                    switch (e.key) {
+                        case 'ArrowUp':
+                            if (Math.min(this.max - 1, this.currentY + 1) !== this.currentY) {
+                                this.currentY = Math.min(this.max - 1, this.currentY + 1);
+                                this.checkFruit();
+
+                                this.doRotateX = true;
+                                this.rotateX = 90;
+                                setTimeout(() => {
+                                    this.doRotateX = false;
+                                    this.rotateX = 0;
+                                }, 400);
+                            }
+                            break;
+                        case 'ArrowDown':
+                            if (Math.max(0, this.currentY - 1) !== this.currentY) {
+                                this.currentY = Math.max(0, this.currentY - 1);
+                                this.checkFruit();
+
+                                this.doRotateX = true;
+                                this.rotateX = -90;
+                                setTimeout(() => {
+                                    this.doRotateX = false;
+                                    this.rotateX = 0;
+                                }, 400);
+                            }
+                            break;
+                        case 'ArrowLeft':
+                            if (Math.max(0, this.currentX - 1) !== this.currentX) {
+                                this.currentX = Math.max(0, this.currentX - 1);
+                                this.checkFruit();
+
+                                this.doRotateY = true;
+                                this.rotateY = -90;
+                                setTimeout(() => {
+                                    this.doRotateY = false;
+                                    this.rotateY = 0;
+                                }, 400);
+                            }
+                            break;
+                        case 'ArrowRight':
+                            if (Math.min(this.max - 1, this.currentX + 1) !== this.currentX) {
+                                this.currentX = Math.min(this.max - 1, this.currentX + 1);
+                                this.checkFruit();
+
+                                this.doRotateY = true;
+                                this.rotateY = 90;
+                                setTimeout(() => {
+                                    this.doRotateY = false;
+                                    this.rotateY = 0;
+                                }, 400);
+                            }
+                            break;
+                    }
+                });
+            }
+        });
+    </script>
+</html>
