@@ -70,7 +70,7 @@
         <input type="number" v-model="seed" placeholder="Seed">
 
         <p style="margin: 0">Chunk Size (Smaller is faster)</p>
-        <input type="number" v-model="chunkSize" placeholder="Chunk Size">
+        <input type="number" @change="chunkSize = parseInt($event.target.value)" v-model="chunkSize" placeholder="Chunk Size">
         <p style="margin: 0; color: red; font-size: 16px; line-height: 16px;">I wouldn't recommend putting this too much above 8. The performance decreases exponentially</p>
 
         <p></p>
@@ -79,7 +79,7 @@
         <p style="margin: 0; color: red; font-size: 16px; line-height: 16px;">Using the fullscreen button in the bottom right corner gives better performance.</p>
         <p style="margin: 0; color: red; font-size: 16px; line-height: 16px;">Chunk rendering may flash a bit so proceed with caution.</p>
 
-        <button @click="startRendering">Start Rendering</button>
+        <button @click="startRendering()">Start Rendering</button>
     </div>
 </div>
 </body>
@@ -255,6 +255,7 @@
             },
 
             getCurrentBiome(x, z) {
+
                 try {
                     for (let i = 0; i < this.chunks.length; i++) {
                         for (let j = 0; j < this.chunks[i].length; j++) {
@@ -264,7 +265,6 @@
                         }
                     }
                 }catch(e) {
-                    console.log(e)
                     return null;
                 }
             },
@@ -309,6 +309,7 @@
             },
 
             generateChunks(x, y) {
+
                 const centerBorders = this.getChunkBorders(x, y);
 
 
@@ -317,6 +318,7 @@
                     this.chunks = null;
 
                     requestAnimationFrame((t) => {
+
                         this.chunks = [
                             [
                                 {border: this.getChunkBorders(x - this.chunkSize, y - this.chunkSize), maps: this.getMaps(this.getChunkBorders(x - this.chunkSize, y - this.chunkSize).topLeft, this.getChunkBorders(x - this.chunkSize, y - this.chunkSize).bottomRight)},
@@ -356,12 +358,11 @@
 
                     if (biome) {
                         this.currentBiome = biome.name;
+                        console.log(biome.name)
                     }else {
                         this.currentBiome = "None";
                     }
-
-                    console.log(biome.name)
-                }, 100)
+                }, 1)
             }
         }
     })
