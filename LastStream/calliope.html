@@ -227,9 +227,7 @@
                         try {
                             this.info = JSON.parse(data);
                         }catch (e) {
-                            if (res.status !== 200) {
-                                this.fetchInfo();
-                            }
+                            console.log(e)
                         }
                     });
             }
@@ -285,7 +283,7 @@
                     </div>
 
                     <div class="nav-body-footer-container" :style="{'height': isNavbarOpen ? '35px' : '0'}">
-                      <p>&copy; Bossslime.com 2020-{{ currentYear }}</p>
+                      <p>&copy; {{ currentDomain }} 2020-{{ currentYear }}</p>
                     </div>
                   </div>
                 </nav>
@@ -294,6 +292,7 @@
             return {
                 isNavbarOpen: false,
                 currentYear: new Date().getFullYear(),
+                currentDomain: /(?<=\.).+/.exec(location.hostname)[0].charAt(0).toUpperCase() + /(?<=\.).+/.exec(location.hostname)[0].slice(1),
 
                 gens: [
                     {

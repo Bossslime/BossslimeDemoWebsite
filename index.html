@@ -51,10 +51,10 @@
                 <v-main>
                     <nav>
                         <a href="https://bossslime.com" style="color: white; text-decoration: none !important;">
-                            <h1>Bossslime.com</h1>
+                            <h1>{{ currentDomain }}</h1>
                         </a>
 
-                        <v-btn color="info" href="https://bossslime.com">Home</v-btn>
+                        <v-btn color="info" :href="'https://' + currentDomain">Home</v-btn>
                     </nav>
 
                     <div style="height: calc(100% - 60px); width: 100%; background-color: var(--background-main-faded);">
@@ -82,7 +82,7 @@
                             </a>
 
                             <div class="footer">
-                                <p>&copy; Bossslime.com 2020-{{ currentYear }}</p>
+                                <p>&copy; {{ currentDomain }} 2020-{{ currentYear }}</p>
                             </div>
                         </div>
                     </div>
@@ -96,6 +96,7 @@
             data() {
                 return {
                     currentYear: new Date().getFullYear(),
+                    currentDomain: /(?<=\.).+/.exec(location.hostname)[0].charAt(0).toUpperCase() + /(?<=\.).+/.exec(location.hostname)[0].slice(1),
 
                     sites: [
                         {
@@ -127,6 +128,12 @@
                             url: '3DDemos',
                             description: 'This is a bunch of 3D games and demos that I made using raw HTML and CSS. No Three.js.',
                             image: 'images/preview-3DDemos.png'
+                        },
+                        {
+                            name: 'Last Stream',
+                            url: 'LastStream',
+                            description: 'This is a website I used to integrate with a youtube scraper I made so you can track that last time a Hololive member streamed.',
+                            image: 'images/preview-LastStream.png'
                         }
                     ]
                 }

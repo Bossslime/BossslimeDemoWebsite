@@ -156,7 +156,7 @@
                             </div>
 
                             <div class="footer">
-                                <p>&copy; Bossslime.com 2020-{{ currentYear }}</p>
+                                <p>&copy; {{ currentDomain }} 2020-{{ currentYear }}</p>
                             </div>
                         </div>
                     </div>
@@ -170,6 +170,7 @@
             data() {
                 return {
                     currentYear: new Date().getFullYear(),
+                    currentDomain: /(?<=\.).+/.exec(location.hostname)[0].charAt(0).toUpperCase() + /(?<=\.).+/.exec(location.hostname)[0].slice(1),
 
                     // Set to true to disable the skeleton loader animation
                     boilerplate: true

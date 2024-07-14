@@ -120,7 +120,7 @@
               {{ clearNumbersButtonText }}
             </div>
 
-            <p>&copy; Bossslime.com 2020-{{ $root.currentYear }}</p>
+            <p>&copy; {{ $root.currentDomain }} 2020-{{ $root.currentYear }}</p>
           </div>
         `,
       data() {
@@ -178,6 +178,7 @@
       data() {
         return {
           currentYear: new Date().getFullYear(), //Used for copyright
+          currentDomain: /(?<=\.).+/.exec(location.hostname)[0].charAt(0).toUpperCase() + /(?<=\.).+/.exec(location.hostname)[0].slice(1),
 
           numbers: [] //This is a data property
         }
