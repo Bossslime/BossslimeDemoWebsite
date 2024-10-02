@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="../../lib/Vue2/vue.min.js"></script>
+    <script src="../../lib/aframe.min.js"></script>
+
+    <script src="../../lib/noise.js"></script>
+
+    <style>
+        html, body                        { width: 100%; height: 100%; margin: 0; }
+        #vueApp                           { width: 100%; height: 100%; }
+
+
+        .biome-container                  { position: absolute; top: 15px; left: 15px; z-index: 9998; width: 250px; height: 100px; border-radius: 5px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); display: flex; justify-content: center; align-content: center; line-height: 100px; font-size: 50px; font-weight: bold; user-select: none; }
+
+
+        .configure-popup                  { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; padding: 15px 10px; width: fit-content; height: fit-content; border-radius: 5px; gap: 5px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-content: center; font-weight: bold; line-height: 24px; font-size: 24px; }
+
+        .configure-popup input            { padding: 10px 15px; border: none; border-radius: 5px; font-size: 20px; font-weight: bold; outline: #007bff 1px solid;  }
+        .configure-popup input:focus      { outline: #0056b3 1px solid; }
+
+        .configure-popup button           { padding: 10px 15px; border: none; border-radius: 5px; background: #007bff; color: white; font-size: 20px; font-weight: bold; cursor: pointer; }
+        .configure-popup button:hover     { background: #0056b3; }
+    </style>
+</head>
+<body>
+<div id="vueApp">
+    <a-scene renderer="antialias: false; highRefreshRate: true;" v-if="configured">
+        <template v-for="chunkRow in chunks" v-if="render">
+            <template v-for="chunk in chunkRow">
+                <template v-for="(row, x) in chunk.maps.noiseMap">
+                    <template v-for="(val, z) in row">
+                        <a-box v-for="y in getValuesUnder(val.val + heightPadding)" :color="getColor(y, val.val + heightPadding)" :position="(val.x + .5 ) + ' ' + (y + .5 - 1) + ' ' + (val.z + .5)" depth="1" height="1" width="1"></a-box>
+                    </template>
+                </template>
+            </template>
+        </template>
+
+
+        <!--      <template v-for="(row, x) in noiseMap" v-if="render">-->
+        <!--        <template v-for="(val, z) in row">-->
+        <!--          <a-box v-for="y in getValuesUnder(val.val + heightPadding)" :color="getColor(y, val.val + heightPadding)" :position="(x + .5 - (width / 2)) + ' ' + (y + .5 - 1) + ' ' + (z - (length / 2) + .5)" depth="1" height="1" width="1"></a-box>-->
+        <!--        </template>-->
+        <!--      </template>-->
+
+        <!--      <a-box v-for="i in 7" color="tomato" :position="'0 ' + (.5 + (i - 1)) + ' 0'" depth="1" height="1" width="1"></a-box>-->
+
+        <!--      <a-plane color="blue" :height="length" :width="width" rotation="-90 0 0" position="0 -.1 0"></a-plane>-->
+
+        <a-entity position="0 0 0">
+            <a-camera id="cam" :position="(chunkSize / 2) + ' 10 ' + (chunkSize / 2)"></a-camera>
+        </a-entity>
+        <a-sky color="#ECECEC"></a-sky>
+    </a-scene>
+
+
+    <div id="overlay" class="biome-container" v-if="configured">
+        {{ currentBiome }}
+    </div>
+
+    <div v-if="!configured" class="configure-popup">
+
+        <h1>Configure</h1>
+
+
+        <p style="margin: 0">Seed</p>
+        <input type="number" v-model="seed" placeholder="Seed">
+
+        <p style="margin: 0">Chunk Size (Smaller is faster)</p>
+        <input type="number" @change="chunkSize = parseInt($event.target.value)" v-model="chunkSize" placeholder="Chunk Size">
+        <p style="margin: 0; color: red; font-size: 16px; line-height: 16px;">I wouldn't recommend putting this too much above 8. The performance decreases exponentially</p>
+
+        <p></p>
+
+        <p style="margin: 0; color: red; font-size: 16px; line-height: 16px;">Mobile devices are not recommended for this</p>
+        <p style="margin: 0; color: red; font-size: 16px; line-height: 16px;">Using the fullscreen button in the bottom right corner gives better performance.</p>
+        <p style="margin: 0; color: red; font-size: 16px; line-height: 16px;">Chunk rendering may flash a bit so proceed with caution.</p>
+
+        <button @click="startRendering()">Start Rendering</button>
+    </div>
+</div>
+</body>
+
+<script>
+    const app = new Vue({
+        el: '#vueApp',
+        data() {
+            return {
+                currentBiome: "None",
+
+                configured: false,
+                render: false,
+                noiseMap: [],
+                biomesMap: [],
+
+                x: 0,
+                z: 0,
+
+                chunkSize: 8,
+
+                heightPadding: 0,
+
+                biomes: [
+                    {
+                        name: 'Large Hills',
+                        val: 255,
+                        noise: 13
+                    },
+                    {
+                        name: 'Large Hills',
+                        val: 235,
+                        noise: 11
+                    },
+
+                    {
+                        name: 'Large Hills',
+                        val: 225,
+                        noise: 10
+                    },
+
+                    {
+                        name: 'Large Hills',
+                        val: 215,
+                        noise: 9
+                    },
+
+                    {
+                        name: 'Large Hills',
+                        val: 205,
+                        noise: 8
+                    },
+                    {
+                        name: 'Hills',
+                        val: 30,
+                        noise: 6
+                    },
+                    {
+                        name: 'Hills',
+                        val: 30,
+                        noise: 5
+                    },
+                    {
+                        name: 'Plains',
+                        val: -100,
+                        noise: 2
+                    },
+                    {
+                        name: 'Plains',
+                        val: -200,
+                        noise: 3
+                    },
+                    {
+                        name: 'River',
+                        val: -230,
+                        noise: 3
+                    },
+                    {
+                        name: 'River',
+                        val: -235,
+                        noise: 5
+                    },
+                    {
+                        name: 'River',
+                        val: -240,
+                        noise: 7
+                    },
+                    {
+                        name: 'Ocean',
+                        val: -245,
+                        noise: 9
+                    },
+                    {
+                        name: 'Ocean',
+                        val: -250,
+                        noise: 11
+                    },
+                    {
+                        name: 'Ocean',
+                        val: -255,
+                        noise: 15
+                    }
+                ],
+
+                seed: 0,
+
+                chunks: null
+            }
+        },
+        methods: {
+            log(val) {
+                console.log(val)
+            },
+            generateNoiseMap(topLeft, bottomRight, biomesMap) {
+                let noiseMap = [];
+
+                noise.seed(this.seed);
+
+                for (let x = topLeft.x; x < bottomRight.x; x++) {
+                    noiseMap[Math.abs(x) % this.chunkSize] = [];
+
+                    for (let z = topLeft.z; z < bottomRight.z; z++) {
+
+                        let value = noise.simplex2((x + 1) / 100, (z + 1) / 100);
+
+                        const biome = this.biomes.find(b => b.val <= biomesMap[Math.abs(x) % this.chunkSize][Math.abs(z) % this.chunkSize]);
+
+                        // console.log(Math.round(value * (biome.noise)) === -0 ? 0 : Math.round(value * (biome.noise)))
+
+                        try {
+                            noiseMap[Math.abs(x) % this.chunkSize][Math.abs(z) % this.chunkSize] = {
+                                x,
+                                z,
+
+                                val: Math.round(value * (biome.noise)) === -0 ? 0 : Math.round(value * (biome.noise)),
+                                biome: biome.name
+                            }
+                        }catch(e) {
+                            console.log(value)
+                        }
+                    }
+                }
+
+                return noiseMap;
+            },
+            generateBiomeNoiseMap(topLeft, bottomRight) {
+                let biomesMap = [];
+
+                noise.seed(this.seed);
+
+                for (let x = topLeft.x; x < bottomRight.x; x++) {
+                    biomesMap[Math.abs(x) % this.chunkSize] = [];
+
+                    for (let y = topLeft.z; y < bottomRight.z; y++) {
+                        let value = noise.simplex2((x + 1) / 100, (y + 1) / 100);
+
+                        biomesMap[Math.abs(x) % this.chunkSize][Math.abs(y) % this.chunkSize] = Math.round(value * 255);
+                    }
+                }
+
+                return biomesMap;
+            },
+
+
+            getColor(num, top) {
+                if (num === top) {
+                    return 'green';
+                }else if (num === top - 1 || num === top - 2) {
+                    return '#492201';
+                }else {
+                    return 'grey';
+                }
+            },
+
+            getCurrentBiome(x, z) {
+
+                try {
+                    for (let i = 0; i < this.chunks.length; i++) {
+                        for (let j = 0; j < this.chunks[i].length; j++) {
+                            if (this.chunks[i][j].border.topLeft.x <= x && this.chunks[i][j].border.bottomRight.x >= x && this.chunks[i][j].border.topLeft.z <= z && this.chunks[i][j].border.bottomRight.z >= z) {
+                                return this.biomes.find(b => b.val <= this.chunks[i][j].maps.biomeMap[Math.abs(x) % this.chunkSize][Math.abs(z) % this.chunkSize]);
+                            }
+                        }
+                    }
+                }catch(e) {
+                    return null;
+                }
+            },
+
+            getValuesUnder(val) {
+                if (val > 0) {
+                    return Array.from({length: val + 1}, (v, k) => k);
+                }else {
+                    return [val]
+                }
+            },
+
+            getChunkBorders(x, z) {
+
+                // const offsetX = x / this.chunkSize < 0 ? Math.ceil(x / this.chunkSize) : Math.floor(x / this.chunkSize);
+                // const offsetZ = z / this.chunkSize < 0 ? Math.ceil(z / this.chunkSize) : Math.floor(z / this.chunkSize);
+
+                // const offsetX = Math.round(x / this.chunkSize);
+                // const offsetZ = Math.round(z / this.chunkSize);
+
+                const offsetX = 0;
+                const offsetZ = 0;
+
+                return {
+                    topLeft: {
+                        x: Math.floor(x / this.chunkSize) * this.chunkSize + offsetX,
+                        z: Math.floor(z / this.chunkSize) * this.chunkSize + offsetZ
+                    },
+                    bottomRight: {
+                        x: Math.floor(x / this.chunkSize) * this.chunkSize + this.chunkSize + offsetX,
+                        z: Math.floor(z / this.chunkSize) * this.chunkSize + this.chunkSize + offsetZ
+                    }
+                }
+            },
+
+            getMaps(topLeft, bottomRight) {
+                const biomeMap = this.generateBiomeNoiseMap(topLeft, bottomRight);
+                return {
+                    noiseMap: this.generateNoiseMap(topLeft, bottomRight, biomeMap),
+                    biomeMap: biomeMap
+                }
+            },
+
+            generateChunks(x, y) {
+
+                const centerBorders = this.getChunkBorders(x, y);
+
+
+                if (this.render && (!this.chunks || !(this.chunks[1][1].border.topLeft.x === centerBorders.topLeft.x && this.chunks[1][1].border.topLeft.z === centerBorders.topLeft.z))) {
+                    this.render = false;
+                    this.chunks = null;
+
+                    requestAnimationFrame((t) => {
+
+                        this.chunks = [
+                            [
+                                {border: this.getChunkBorders(x - this.chunkSize, y - this.chunkSize), maps: this.getMaps(this.getChunkBorders(x - this.chunkSize, y - this.chunkSize).topLeft, this.getChunkBorders(x - this.chunkSize, y - this.chunkSize).bottomRight)},
+                                {border: this.getChunkBorders(x, y - this.chunkSize), maps: this.getMaps(this.getChunkBorders(x, y - this.chunkSize).topLeft, this.getChunkBorders(x, y - this.chunkSize).bottomRight)},
+                                {border: this.getChunkBorders(x + this.chunkSize, y - this.chunkSize), maps: this.getMaps(this.getChunkBorders(x + this.chunkSize, y - this.chunkSize).topLeft, this.getChunkBorders(x + this.chunkSize, y - this.chunkSize).bottomRight)}
+                            ],
+                            [
+                                {border: this.getChunkBorders(x - this.chunkSize, y), maps: this.getMaps(this.getChunkBorders(x - this.chunkSize, y).topLeft, this.getChunkBorders(x - this.chunkSize, y).bottomRight)},
+                                {border: this.getChunkBorders(x, y), maps: this.getMaps(this.getChunkBorders(x, y).topLeft, this.getChunkBorders(x, y).bottomRight)},
+                                {border: this.getChunkBorders(x + this.chunkSize, y), maps: this.getMaps(this.getChunkBorders(x + this.chunkSize, y).topLeft, this.getChunkBorders(x + this.chunkSize, y).bottomRight)}
+                            ],
+                            [
+                                {border: this.getChunkBorders(x - this.chunkSize, y + this.chunkSize), maps: this.getMaps(this.getChunkBorders(x - this.chunkSize, y + this.chunkSize).topLeft, this.getChunkBorders(x - this.chunkSize, y + this.chunkSize).bottomRight)},
+                                {border: this.getChunkBorders(x, y + this.chunkSize), maps: this.getMaps(this.getChunkBorders(x, y + this.chunkSize).topLeft, this.getChunkBorders(x, y + this.chunkSize).bottomRight)},
+                                {border: this.getChunkBorders(x + this.chunkSize, y + this.chunkSize), maps: this.getMaps(this.getChunkBorders(x + this.chunkSize, y + this.chunkSize).topLeft, this.getChunkBorders(x + this.chunkSize, y + this.chunkSize).bottomRight)}
+                            ]
+                        ]
+
+                        this.render = true;
+                    })
+                }
+            },
+
+
+            startRendering() {
+                this.render = true;
+                this.configured = true;
+
+                setInterval(() => {
+                    //Get biome
+                    this.x = Math.round(document.getElementById('cam').getAttribute('position').x);
+                    this.z = Math.round(document.getElementById('cam').getAttribute('position').z);
+
+                    this.generateChunks(this.x, this.z);
+
+                    const biome = this.getCurrentBiome(this.x, this.z);
+
+                    if (biome) {
+                        this.currentBiome = biome.name;
+                        console.log(biome.name)
+                    }else {
+                        this.currentBiome = "None";
+                    }
+                }, 1)
+            }
+        }
+    })
+</script>
+</html>
